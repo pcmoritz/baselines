@@ -3,6 +3,7 @@ import os
 import dill
 import tempfile
 import tensorflow as tf
+import time
 import zipfile
 
 import baselines.common.tf_util as U
@@ -208,6 +209,7 @@ def learn(env,
     with tempfile.TemporaryDirectory() as td:
         model_saved = False
         model_file = os.path.join(td, "model")
+        begin_time = time.time()
         for t in range(max_timesteps):
             if callback is not None:
                 if callback(locals(), globals()):
@@ -248,6 +250,7 @@ def learn(env,
                 logger.record_tabular("episodes", num_episodes)
                 logger.record_tabular("mean 100 episode reward", mean_100ep_reward)
                 logger.record_tabular("% time spent exploring", int(100 * exploration.value(t)))
+                logger.record_tabular("seconds elapsed", time.time() - begin_time)
                 logger.dump_tabular()
 
             if (checkpoint_freq is not None and t > learning_starts and
